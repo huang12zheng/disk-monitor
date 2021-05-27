@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  name: redis
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: disk-server-redis
+  template:
+    metadata:
+      labels:
+        app: disk-server-redis
+    spec:
+      containers:
+      - command:
+        - bash
+        - "-c"
+        - redis-server /usr/local/etc/redis/redis.conf
+        image: redis
+        imagePullPolicy: IfNotPresent
+        name: disk-server-redis
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        # - mountPath: "/usr/local/etc/redis/redis.conf"
+        #   name: redis-conf
+        - mountPath: "/data"
+          name: redis-data
+      volumes:
+      # - hostPath:
+      #     path: "/home/ubuntu/disk_server_config/redis.conf"
+      #     type: File
+      #   name: redis-conf
+      - hostPath:
+          path: "/home/ubuntu/disk_server_config/redis"
+          type: DirectoryOrCreate
+        name: redis-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: disk-server-redis
+  namespace: default
+spec:
+  ports:
+  - name: tcp
+    nodePort: 31079
+    port: 6379
+  selector:
+    app: disk-server-redis
+  type: NodePort

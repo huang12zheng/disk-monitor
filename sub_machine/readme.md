@@ -1,0 +1,1 @@
+pyinstall -F "disk_capacity.py"
