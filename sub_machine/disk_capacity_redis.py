@@ -5,9 +5,13 @@ import platform
 import ctypes
 import json
 import queue,requests,time
+from sub_machine.disk_redis import MonitorInfo
 import sys
 
-arg1 = sys.argv[1]
+import socket
+
+args=sys.argv
+HostName = sys.argv[1] if len(args) > 0 else None
 
 
 def get_free_space_mb(folder):
@@ -28,18 +32,33 @@ def post_data(url,args):
     r = requests.post(url, data=datas, headers=headers)
     print(r.text)
 
-# def setDiskValue():
-
+def getIP():
+    #获取本机电脑名
+    myname = socket.getfqdn(socket.gethostname(  ))
+    #获取本机ip
+    myaddr = socket.gethostbyname(myname)
+    return myname,myaddr
 
 try:
-    # get_free_space_mb('G:\')
     if platform.system() == 'Windows':
-        dir='G:\\'
+        name,ip=getIP()
+        if HostName==None:
+            if name!=None:
+                HostName=name
+            else:
+                HostName=ip
+        monitor=MonitorInfo(HostName)
+        monitor.getMonitorInfo().setLastMonitorInfo()
+        
+        monitor.CapacityG=get_free_space_mb("G:\\")
+        monitor.CapacityF=get_free_space_mb("F:\\")
+        monitor.CapacityE=get_free_space_mb("E:\\")
+        monitor.CapacityD=get_free_space_mb("D:\\")
+        monitor.createTime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        monitor.setMonitorInfo()
     else:
         dir='/dev/disk1s5'
-    val=get_free_space_mb(dir)
-    print(arg1)
-    print(val)
+        print("do none")
 
     # post_data(arg1,{"available": val,"time":time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) })
 

@@ -87,9 +87,10 @@ class MonitorInfo:
         r.mset(MonitorInfoDict)
     
     def setLastMonitorInfo(self):
-        r.mset(f"{id}::LastCapacityG",f"{id}::LastCapacityF",f"{id}::LastCapacityE",f"{id}::LastCapacityD",f"{id}::LastcreateTime")
-        DiskInfoDict = dict(zip(
-            [ f"{id}::LastCapacityG",f"{id}::LastCapacityF",f"{id}::LastCapacityE",f"{id}::LastCapacityD",f"{id}::LastcreateTime"],
-            [ self.CapacityG,self.CapacityF,self.CapacityE,self.CapacityD,self.createTime ]
-        ))
-        r.mset(DiskInfoDict)
+        if self.CapacityG!=None:
+            r.mset(f"{id}::LastCapacityG",f"{id}::LastCapacityF",f"{id}::LastCapacityE",f"{id}::LastCapacityD",f"{id}::LastcreateTime")
+            DiskInfoDict = dict(zip(
+                [ f"{id}::LastCapacityG",f"{id}::LastCapacityF",f"{id}::LastCapacityE",f"{id}::LastCapacityD",f"{id}::LastcreateTime"],
+                [ self.CapacityG,self.CapacityF,self.CapacityE,self.CapacityD,self.createTime ]
+            ))
+            r.mset(DiskInfoDict)
