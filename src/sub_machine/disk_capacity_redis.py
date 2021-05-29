@@ -4,14 +4,15 @@ import os
 import platform
 import ctypes
 import json
-import queue,requests,time
-from sub_machine.disk_redis import MonitorInfo
+# import queue,time
+from disk_redis import MonitorInfo
 import sys
 
 import socket
 
 args=sys.argv
-HostName = sys.argv[1] if len(args) > 0 else None
+if len(args) > 1:
+    HostName = sys.argv[1] 
 
 
 def get_free_space_mb(folder):
@@ -24,29 +25,11 @@ def get_free_space_mb(folder):
         st = os.statvfs(folder)
         return st.f_bavail * st.f_frsize / 1024 // 1024
 
-def post_data(url,args):
-    headers = {'Content-Type': 'application/json'}
-    # datas = json.dumps({"param1": "Detector", "param2": "cnblogs"})
-    datas = json.dumps(args)
-    # r = requests.post("http://httpbin.org/post", data=datas, headers=headers)
-    r = requests.post(url, data=datas, headers=headers)
-    print(r.text)
-
-def getIP():
-    #获取本机电脑名
-    myname = socket.getfqdn(socket.gethostname(  ))
-    #获取本机ip
-    myaddr = socket.gethostbyname(myname)
-    return myname,myaddr
 
 try:
     if platform.system() == 'Windows':
-        name,ip=getIP()
-        if HostName==None:
-            if name!=None:
-                HostName=name
-            else:
-                HostName=ip
+
+        HostName="Default"
         monitor=MonitorInfo(HostName)
         monitor.getMonitorInfo().setLastMonitorInfo()
         
